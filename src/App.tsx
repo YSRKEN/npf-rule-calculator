@@ -1,7 +1,90 @@
-import React from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 
+type SensorSize = 'full' | 'apsc-c' | 'apsc-x' | 'mft';
+type ActionType = 'setSensorSize';
+
+interface Action {
+  type: ActionType;
+  message?: string;
+}
+
+interface AppStore {
+  sensorSize: SensorSize;
+  dispatch: (action: Action) => void;
+}
+
+const useAppStore = (): AppStore => {
+  const [sensorSize, setSensorSize] = useState<SensorSize>('full');
+
+  useEffect(() => { console.log(`sensorSize=${sensorSize}`) }, [sensorSize]);
+
+  const dispatch = (action: Action) => {
+    switch (action.type) {
+      case 'setSensorSize':
+        setSensorSize(action.message as SensorSize);
+        break;
+    }
+  };
+
+  return {
+    sensorSize,
+    dispatch
+  };
+};
+
+const AppContext = createContext<AppStore>({} as AppStore);
+
+const InputForm: React.FC = () => {
+  const { sensorSize, dispatch } = useContext(AppContext);
+
+  return <Form className="border p-3">
+    <Form.Group>
+      <Form.Label>
+        センサーサイズ
+    </Form.Label>
+      <Form.Control as="select" value={sensorSize}
+        onChange={(e) => dispatch({ type: 'setSensorSize', message: e.currentTarget.value })}>
+        <option value="full">フルサイズ</option>
+        <option value="apsc-c">APS-C (Canon)</option>
+        <option value="apsc-x">APS-C (それ以外)</option>
+        <option value="mft">マイクロフォーサーズ</option>
+      </Form.Control>
+    </Form.Group>
+    <Form.Group>
+      <Form.Label>
+        画像の横幅のピクセル数
+    </Form.Label>
+      <Form.Control type="range" min={1} max={10000} />
+    </Form.Group>
+    <Form.Group>
+      <Form.Label>
+        実焦点距離
+    </Form.Label>
+      <Form.Control type="range" min={1} max={1000} />
+    </Form.Group>
+    <Form.Group>
+      <Form.Label>
+        絞り値
+    </Form.Label>
+      <Form.Control type="range" min={1} max={36} />
+    </Form.Group>
+    <Form.Group>
+      <Form.Label>
+        星の写り方
+    </Form.Label>
+      <Form.Control as="select">
+        <option value="pin-point">一つの点</option>
+        <option value="slight">Slight Trail</option>
+        <option value="visible">Visible Trail</option>
+      </Form.Control>
+    </Form.Group>
+  </Form>;
+};
+
 const App: React.FC = () => {
+  const store = useAppStore();
+
   return (
     <Container>
       <Row className="my-3">
@@ -16,47 +99,9 @@ const App: React.FC = () => {
       </Row>
       <Row className="my-3">
         <Col>
-          <Form>
-            <Form.Group>
-              <Form.Label>
-                センサーサイズ
-              </Form.Label>
-              <Form.Control as="select">
-                <option value="full">フルサイズ</option>
-                <option value="apsc-c">APS-C (Canon)</option>
-                <option value="apsc-x">APS-C (それ以外)</option>
-                <option value="mft">マイクロフォーサーズ</option>
-              </Form.Control>
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>
-                画像の横幅のピクセル数
-              </Form.Label>
-              <Form.Control type="range" min={1} max={10000} />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>
-                実焦点距離
-              </Form.Label>
-              <Form.Control type="range" min={1} max={1000} />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>
-                絞り値
-              </Form.Label>
-              <Form.Control type="range" min={1} max={36} />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>
-                星の写り方
-              </Form.Label>
-              <Form.Control as="select">
-                <option value="pin-point">一つの点</option>
-                <option value="slight">Slight Trail</option>
-                <option value="visible">Visible Trail</option>
-              </Form.Control>
-            </Form.Group>
-          </Form>
+          <AppContext.Provider value={store}>
+            <InputForm />
+          </AppContext.Provider>
         </Col>
       </Row>
     </Container>
