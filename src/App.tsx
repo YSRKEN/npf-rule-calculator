@@ -85,23 +85,28 @@ const InputForm: React.FC = () => {
       </Form.Control>
     </Form.Group>
     <Form.Group>
-      <Form.Label>
-        画像の横幅： {pixelWidth} [ピクセル]
-      </Form.Label>
+      <div className="d-flex">
+        <Form.Label>画像の横幅：</Form.Label>
+        <Form.Control className="mx-1" style={{ width: 50 }} size="sm" value={pixelWidth} onChange={(e) => dispatch({ type: 'setPixelWidth', message: e.currentTarget.value })} />
+        <Form.Label>[ピクセル]</Form.Label>
+      </div>
       <Form.Control type="range" min={1} max={10000} value={pixelWidth}
         onChange={(e) => dispatch({ type: 'setPixelWidth', message: e.currentTarget.value })} />
     </Form.Group>
     <Form.Group>
-      <Form.Label>
-        実焦点距離： {focalLength} [mm]
-    </Form.Label>
+      <div className="d-flex">
+        <Form.Label>実焦点距離：</Form.Label>
+        <Form.Control className="mx-1" style={{ width: 50 }} size="sm" value={focalLength} onChange={(e) => dispatch({ type: 'setFocalLength', message: e.currentTarget.value })} />
+        <Form.Label>[mm]</Form.Label>
+      </div>
       <Form.Control type="range" min={1} max={1000} value={focalLength}
         onChange={(e) => dispatch({ type: 'setFocalLength', message: e.currentTarget.value })} />
     </Form.Group>
     <Form.Group>
-      <Form.Label>
-        絞り値： F{1.0 * fNumber10 / 10}
-      </Form.Label>
+      <div className="d-flex">
+        <Form.Label>絞り値：F</Form.Label>
+        <Form.Control className="mx-1" style={{ width: 50 }} size="sm" value={fNumber10} onChange={(e) => dispatch({ type: 'setFNumber10', message: e.currentTarget.value })} />
+      </div>
       <Form.Control type="range" min={7} max={360} value={fNumber10}
         onChange={(e) => dispatch({ type: 'setFNumber10', message: e.currentTarget.value })} />
     </Form.Group>
