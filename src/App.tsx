@@ -3,7 +3,7 @@ import { Col, Container, Form, Row } from 'react-bootstrap';
 
 type SensorSize = 'full' | 'apsc-c' | 'apsc-x' | 'mft';
 type TrailType = 'pin-point' | 'slight' | 'visible';
-type ActionType = 'setSensorSize' | 'setPixelWidth' | 'setFocalLength' | 'setFNumber10' | 'setTrailType';
+type ActionType = 'setSensorSize' | 'setPixelWidth' | 'setFocalLength' | 'setFNumber' | 'setTrailType';
 
 interface Action {
   type: ActionType;
@@ -14,7 +14,7 @@ interface AppStore {
   sensorSize: SensorSize;
   pixelWidth: number;
   focalLength: number;
-  fNumber10: number;
+  fNumber: number;
   trailType: TrailType;
   dispatch: (action: Action) => void;
 }
@@ -23,7 +23,7 @@ const useAppStore = (): AppStore => {
   const [sensorSize, setSensorSize] = useState<SensorSize>('full');
   const [pixelWidth, setPixelWidth] = useState(6000);
   const [focalLength, setFocalLength] = useState(50);
-  const [fNumber10, setFNumber10] = useState(14);
+  const [fNumber, setFNumber] = useState(1.4);
   const [trailType, setTrailType] = useState<TrailType>('pin-point');
 
   useEffect(() => {
@@ -31,10 +31,10 @@ const useAppStore = (): AppStore => {
       sensorSize,
       pixelWidth,
       focalLength,
-      fNumber10,
+      fNumber,
       trailType
     })
-  }, [sensorSize, pixelWidth, focalLength, fNumber10, trailType]);
+  }, [sensorSize, pixelWidth, focalLength, fNumber, trailType]);
 
   const dispatch = (action: Action) => {
     switch (action.type) {
@@ -47,8 +47,8 @@ const useAppStore = (): AppStore => {
       case 'setFocalLength':
         setFocalLength(parseInt(action.message as string, 10));
         break;
-      case 'setFNumber10':
-        setFNumber10(parseInt(action.message as string, 10));
+      case 'setFNumber':
+        setFNumber(parseFloat(action.message as string));
         break;
       case 'setTrailType':
         setTrailType(action.message as TrailType);
@@ -60,7 +60,7 @@ const useAppStore = (): AppStore => {
     sensorSize,
     pixelWidth,
     focalLength,
-    fNumber10,
+    fNumber,
     trailType,
     dispatch
   };
@@ -69,7 +69,7 @@ const useAppStore = (): AppStore => {
 const AppContext = createContext<AppStore>({} as AppStore);
 
 const InputForm: React.FC = () => {
-  const { sensorSize, pixelWidth, focalLength, fNumber10, trailType, dispatch } = useContext(AppContext);
+  const { sensorSize, pixelWidth, focalLength, fNumber, trailType, dispatch } = useContext(AppContext);
 
   return <Form className="border p-3">
     <Form.Group>
@@ -105,10 +105,10 @@ const InputForm: React.FC = () => {
     <Form.Group>
       <div className="d-flex">
         <Form.Label>絞り値：F</Form.Label>
-        <Form.Control className="mx-1" style={{ width: 50 }} size="sm" value={fNumber10} onChange={(e) => dispatch({ type: 'setFNumber10', message: e.currentTarget.value })} />
+        <Form.Control className="mx-1" style={{ width: 50 }} size="sm" value={fNumber} onChange={(e) => dispatch({ type: 'setFNumber', message: e.currentTarget.value })} />
       </div>
-      <Form.Control type="range" min={7} max={360} value={fNumber10}
-        onChange={(e) => dispatch({ type: 'setFNumber10', message: e.currentTarget.value })} />
+      <Form.Control type="range" min={0.7} max={36} value={fNumber} step={0.1}
+        onChange={(e) => dispatch({ type: 'setFNumber', message: e.currentTarget.value })} />
     </Form.Group>
     <Form.Group>
       <Form.Label>
