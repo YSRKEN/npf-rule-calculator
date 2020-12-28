@@ -16,8 +16,24 @@ interface AppStore {
   focalLength: number;
   fNumber: number;
   trailType: TrailType;
+  time: number;
   dispatch: (action: Action) => void;
 }
+
+// センサーの種類ごとの、センサーの物理的な横幅(um)
+const SENSOR_WIDTH: { [key: string]: number } = {
+  'full': 36000,
+  'apsc-c': 22300,
+  'apsc-x': 23600,
+  'mft': 17300
+};
+
+// 星の写り方ごとの係数
+const TRAIL_PARAM: { [key: string]: number } = {
+  'pin-point': 1.0,
+  'slight': 2.0,
+  'visible': 3.0
+};
 
 const useAppStore = (): AppStore => {
   const [sensorSize, setSensorSize] = useState<SensorSize>('full');
@@ -25,15 +41,18 @@ const useAppStore = (): AppStore => {
   const [focalLength, setFocalLength] = useState(50);
   const [fNumber, setFNumber] = useState(1.4);
   const [trailType, setTrailType] = useState<TrailType>('pin-point');
+  const [time, setTime] = useState(0.0);
 
   useEffect(() => {
-    console.log({
-      sensorSize,
-      pixelWidth,
-      focalLength,
-      fNumber,
-      trailType
-    })
+    /* NPFルールによると、適切な露光時間は次の式で与えられる。
+     * t=k*(16.856*N+0.0997*f+13.713*p)/(f*cos(δ))
+     * Nは絞り値[F]、fは実焦点距離[mm]、pはピクセルピッチ[um]、δは天の赤道から緯度がどれだけ異なるか[rad]
+     */
+    const pixelPitch = SENSOR_WIDTH[sensorSize as string] / pixelWidth;
+    const delta = 0.0;
+    const k = TRAIL_PARAM[trailType as string];
+    const time = k * (16.856 * fNumber + 0.0997 * focalLength + 13.713 * pixelPitch) / (focalLength * Math.cos(delta));
+    setTime(time);
   }, [sensorSize, pixelWidth, focalLength, fNumber, trailType]);
 
   const dispatch = (action: Action) => {
@@ -62,6 +81,7 @@ const useAppStore = (): AppStore => {
     focalLength,
     fNumber,
     trailType,
+    time,
     dispatch
   };
 };
@@ -69,7 +89,7 @@ const useAppStore = (): AppStore => {
 const AppContext = createContext<AppStore>({} as AppStore);
 
 const InputForm: React.FC = () => {
-  const { sensorSize, pixelWidth, focalLength, fNumber, trailType, dispatch } = useContext(AppContext);
+  const { sensorSize, pixelWidth, focalLength, fNumber, trailType, time, dispatch } = useContext(AppContext);
 
   return <Form className="border p-3">
     <Form.Group>
@@ -120,6 +140,10 @@ const InputForm: React.FC = () => {
         <option value="slight">Slight Trail</option>
         <option value="visible">Visible Trail</option>
       </Form.Control>
+    </Form.Group>
+    <hr />
+    <Form.Group>
+      <Form.Label>適切な露光時間：{Math.round(time * 10.0) / 10.0}[秒]</Form.Label>
     </Form.Group>
   </Form>;
 };
