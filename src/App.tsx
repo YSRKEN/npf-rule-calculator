@@ -12,9 +12,9 @@ interface Action {
 
 interface AppStore {
   sensorSize: SensorSize;
-  pixelWidth: number;
-  focalLength: number;
-  fNumber: number;
+  pixelWidth: string;
+  focalLength: string;
+  fNumber: string;
   trailType: TrailType;
   time: number;
   dispatch: (action: Action) => void;
@@ -40,6 +40,9 @@ const useAppStore = (): AppStore => {
   const [pixelWidth, setPixelWidth] = useState(6000);
   const [focalLength, setFocalLength] = useState(50);
   const [fNumber, setFNumber] = useState(1.4);
+  const [pixelWidthS, setPixelWidthS] = useState('6000');
+  const [focalLengthS, setFocalLengthS] = useState('50');
+  const [fNumberS, setFNumberS] = useState('1.4');
   const [trailType, setTrailType] = useState<TrailType>('pin-point');
   const [time, setTime] = useState(0.0);
 
@@ -55,19 +58,40 @@ const useAppStore = (): AppStore => {
     setTime(time);
   }, [sensorSize, pixelWidth, focalLength, fNumber, trailType]);
 
+  useEffect(() => {
+    const pixel = parseInt(pixelWidthS, 10);
+    if (!isNaN(pixel)) {
+      setPixelWidth(pixel);
+    }
+  }, [pixelWidthS]);
+
+  useEffect(() => {
+    const focal = parseInt(focalLengthS, 10);
+    if (!isNaN(focal)) {
+      setFocalLength(focal);
+    }
+  }, [focalLengthS]);
+
+  useEffect(() => {
+    const f = parseInt(fNumberS, 10);
+    if (!isNaN(f)) {
+      setFNumber(f);
+    }
+  }, [fNumberS]);
+
   const dispatch = (action: Action) => {
     switch (action.type) {
       case 'setSensorSize':
         setSensorSize(action.message as SensorSize);
         break;
       case 'setPixelWidth':
-        setPixelWidth(parseInt(action.message as string, 10));
+        setPixelWidthS(action.message as string);
         break;
       case 'setFocalLength':
-        setFocalLength(parseInt(action.message as string, 10));
+        setFocalLengthS(action.message as string);
         break;
       case 'setFNumber':
-        setFNumber(parseFloat(action.message as string));
+        setFNumberS(action.message as string);
         break;
       case 'setTrailType':
         setTrailType(action.message as TrailType);
@@ -77,9 +101,9 @@ const useAppStore = (): AppStore => {
 
   return {
     sensorSize,
-    pixelWidth,
-    focalLength,
-    fNumber,
+    pixelWidth: pixelWidthS,
+    focalLength: focalLengthS,
+    fNumber: fNumberS,
     trailType,
     time,
     dispatch
@@ -137,8 +161,8 @@ const InputForm: React.FC = () => {
       <Form.Control as="select" value={trailType}
         onChange={(e) => dispatch({ type: 'setTrailType', message: e.currentTarget.value })}>
         <option value="pin-point">一つの点</option>
-        <option value="slight">Slight Trail</option>
-        <option value="visible">Visible Trail</option>
+        <option value="slight">少し光跡が見える</option>
+        <option value="visible">光跡が見える</option>
       </Form.Control>
     </Form.Group>
     <hr />
