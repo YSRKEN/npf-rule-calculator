@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "mft-db-tool"
+  },
+  "targets": {
+    "mft-db-tool": {
+      "hosting": {
+        "npf-rule-calculator": [
+          "npf-rule-calculator"
+        ]
+      }
+    }
+  }
+}
