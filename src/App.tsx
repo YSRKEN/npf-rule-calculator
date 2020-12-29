@@ -188,6 +188,13 @@ const App: React.FC = () => {
         </Col>
       </Row>
       <Row className="my-3">
+        <Col className="text-center">
+          <a href="https://github.com/YSRKEN/npf-rule-calculator/tree/develop">GitHub</a>
+          <span>　</span>
+          <a href="https://twitter.com/YSRKEN">作者のTwitter</a>
+        </Col>
+      </Row>
+      <Row className="my-3">
         <Col>
           <AppContext.Provider value={store}>
             <InputForm />
