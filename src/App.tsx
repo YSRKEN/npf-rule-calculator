@@ -73,7 +73,7 @@ const useAppStore = (): AppStore => {
   }, [focalLengthS]);
 
   useEffect(() => {
-    const f = parseInt(fNumberS, 10);
+    const f = Math.round(parseFloat(fNumberS) * 10.0) / 10.0;
     if (!isNaN(f)) {
       setFNumber(f);
     }
